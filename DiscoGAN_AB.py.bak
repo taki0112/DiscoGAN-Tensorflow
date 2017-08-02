@@ -165,7 +165,7 @@ def DiscoGAN_model(mode) :
 
             # discriminate generated image A or B
             D_generated_A = discriminator('A', G_BA, reuse=True)
-            D_generated_B = discriminator('B', G_AB, reuse=True) 
+            D_generated_B = discriminator('B', G_AB, reuse=True) # logits_fake_A2B
 
             # GAN loss of real A or generated A
             loss_real_A = GAN_loss(logits=D_real_A, is_real=True)
