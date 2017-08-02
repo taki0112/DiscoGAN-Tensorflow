@@ -3,7 +3,7 @@ import tensorflow.contrib as tf_contrib
 import celebA
 import os
 
-tf.contrib.layers
+
 layers = tf_contrib.layers
 
 batch_size = 32
@@ -20,15 +20,6 @@ learning_rate = 0.0002
 adam_beta1 = 0.9
 adam_beta2 = 0.999
 adam_epsilon = 1e-08
-
-# Choose style
-style_A = 'Blond_Hair'
-style_B = 'Black_Hair'
-constraint = 'Male'
-constraint_type = '1'
-is_test = False
-n_test = 200
-
 
 arg_scope = tf_contrib.framework.arg_scope
 def lrelu(x, leak=0.2, name='lrelu'):
