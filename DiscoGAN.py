@@ -5,7 +5,7 @@ from collections import deque
 
 class DiscoGAN(object):
     def __init__(self, sess, epoch, dataset, batch_size, learning_rate, beta1, beta2, weight_decay, checkpoint_dir, result_dir, log_dir, sample_dir):
-        self.model_name = 'CycleGAN'
+        self.model_name = 'DiscoGAN'
         self.sess = sess
         self.checkpoint_dir = checkpoint_dir
         self.result_dir = result_dir
@@ -14,7 +14,6 @@ class DiscoGAN(object):
         self.dataset_name = dataset
 
         self.print_freq = 100
-        self.decay_step = 100
         self.epoch = epoch
         self.batch_size = batch_size
 
