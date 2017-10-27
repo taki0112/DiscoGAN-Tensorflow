@@ -5,7 +5,7 @@ from ops import *
 from utils import *
 """parsing and configuration"""
 def parse_args():
-    desc = "Tensorflow implementation of CycleGAN"
+    desc = "Tensorflow implementation of DiscoGAN"
     parser = argparse.ArgumentParser(description=desc)
     parser.add_argument('--phase', type=str, default='train', help='train or test ?')
     parser.add_argument('--epoch', type=int, default=200, help='The number of epochs to run')
