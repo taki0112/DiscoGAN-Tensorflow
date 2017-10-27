@@ -2,7 +2,10 @@
 Tensorflow implementation of DiscoGAN
 
 ## In progress
-[presentation](https://www.slideshare.net/ssuser34f9fc/gan-inkakao)
+
+## Related works
+* [presentation](https://www.slideshare.net/ssuser34f9fc/gan-inkakao)
+* [CycleGAN](https://github.com/taki0112/CycleGAN-Tensorflow)
 
 ## Author
 Junho Kim
