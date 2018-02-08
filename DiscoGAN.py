@@ -1,7 +1,7 @@
 from ops import *
 from utils import *
+from glob import glob
 import time
-from collections import deque
 
 class DiscoGAN(object):
     def __init__(self, sess, epoch, dataset, batch_size, learning_rate, beta1, beta2, weight_decay, checkpoint_dir, result_dir, log_dir, sample_dir):
@@ -26,7 +26,7 @@ class DiscoGAN(object):
         self.width = 256
         self.channel = 3
 
-        self.trainA, self.trainB, self.testA, self.testB = prepare_data(dataset_name=self.dataset_name)
+        self.trainA, self.trainB = prepare_data(dataset_name=self.dataset_name)
         self.num_batches = max(len(self.trainA) // self.batch_size, len(self.trainB) // self.batch_size)
         # may be i will use deque
 
@@ -164,10 +164,10 @@ class DiscoGAN(object):
         for epoch in range(start_epoch, self.epoch):
             # get batch data
             for idx in range(start_batch_id, self.num_batches):
-                batch_A_images = self.trainA[idx*self.batch_size:(idx+1)*self.batch_size]
-                batch_B_images = self.trainB[idx*self.batch_size:(idx+1)*self.batch_size]
-
-                self.rotating('train')
+                random_index_A = np.random.choice(len(self.trainA), size=self.batch_size, replace=False)
+                random_index_B = np.random.choice(len(self.trainB), size=self.batch_size, replace=False)
+                batch_A_images = self.trainA[random_index_A]
+                batch_B_images = self.trainB[random_index_B]
 
                 # Update D
                 _, summary_str = self.sess.run(
@@ -186,11 +186,16 @@ class DiscoGAN(object):
                 print("Epoch: [%2d] [%4d/%4d] time: %4.4f" \
                       % (epoch, idx, self.num_batches, time.time() - start_time))
 
-                if np.mod(counter, self.print_freq) == 0 :
+                if np.mod(counter, 100) == 0 :
+                    save_images(batch_A_images, [self.batch_size, 1],
+                                './{}/real_A_{:02d}_{:04d}.jpg'.format(self.sample_dir, epoch, idx+2))
+                    save_images(batch_B_images, [self.batch_size, 1],
+                                './{}/real_B_{:02d}_{:04d}.jpg'.format(self.sample_dir, epoch, idx+2))
+
                     save_images(fake_A, [self.batch_size, 1],
-                                './{}/A_{:02d}_{:04d}.jpg'.format(self.sample_dir, epoch, idx))
+                                './{}/fake_A_{:02d}_{:04d}.jpg'.format(self.sample_dir, epoch, idx+2))
                     save_images(fake_B, [self.batch_size, 1],
-                                './{}/B_{:02d}_{:04d}.jpg'.format(self.sample_dir, epoch, idx))
+                                './{}/fake_B_{:02d}_{:04d}.jpg'.format(self.sample_dir, epoch, idx+2))
 
                 # After an epoch, start_batch_id is set to zero
                 # non-zero value is only for the first epoch after loading pre-trained model
@@ -201,27 +206,6 @@ class DiscoGAN(object):
 
             # save model for final step
             self.save(self.checkpoint_dir, counter)
-
-
-    def rotating(self, flag):
-        if flag == 'train' :
-            self.trainA = deque(self.trainA)
-            self.trainB = deque(self.trainB)
-
-            self.trainA.rotate(-self.batch_size)
-            self.trainB.rotate(-self.batch_size)
-
-            self.trainA = np.asarray(self.trainA)
-            self.trainB = np.asarray(self.trainB)
-        else :
-            self.testA = deque(self.testA)
-            self.testB = deque(self.testB)
-
-            self.testA.rotate(-self.batch_size)
-            self.testB.rotate(-self.batch_size)
-
-            self.testA = np.asarray(self.testA)
-            self.testB = np.asarray(self.testB)
 
 
     @property
@@ -256,8 +240,8 @@ class DiscoGAN(object):
 
     def test(self):
         tf.global_variables_initializer().run()
-        test_A_images = self.testA[:]
-        test_B_images = self.testB[:]
+        test_A_files = glob('./dataset/{}/*.*'.format(self.dataset_name + '/testA'))
+        test_B_files = glob('./dataset/{}/*.*'.format(self.dataset_name + '/testB'))
 
         could_load, checkpoint_counter = self.load(self.checkpoint_dir)
 
@@ -272,11 +256,12 @@ class DiscoGAN(object):
         index.write("<html><body><table><tr>")
         index.write("<th>name</th><th>input</th><th>output</th></tr>")
 
-        for sample_file  in test_A_images : # A -> B
-            print('Processing image: ' + sample_file)
+        for sample_file  in test_A_files : # A -> B
+            print('Processing A image: ' + sample_file)
+            sample_image = np.asarray(load_test_data(sample_file))
             image_path = os.path.join(self.result_dir,'{0}'.format(os.path.basename(sample_file)))
 
-            fake_img = self.sess.run(self.fake_B, feed_dict = {self.domain_A :sample_file})
+            fake_img = self.sess.run(self.fake_B, feed_dict = {self.domain_A :sample_image})
             save_images(fake_img, [1, 1], image_path)
             index.write("<td>%s</td>" % os.path.basename(image_path))
             index.write("<td><img src='%s'></td>" % (sample_file if os.path.isabs(sample_file) else (
@@ -285,11 +270,12 @@ class DiscoGAN(object):
                 '..' + os.path.sep + image_path)))
             index.write("</tr>")
 
-        for sample_file  in test_B_images : # B -> A
-            print('Processing image: ' + sample_file)
+        for sample_file  in test_B_files : # B -> A
+            print('Processing B image: ' + sample_file)
+            sample_image = np.asarray(load_test_data(sample_file))
             image_path = os.path.join(self.result_dir,'{0}'.format(os.path.basename(sample_file)))
 
-            fake_img = self.sess.run(self.fake_A, feed_dict = {self.domain_B : sample_file})
+            fake_img = self.sess.run(self.fake_A, feed_dict = {self.domain_B : sample_image})
             save_images(fake_img, [1, 1], image_path)
             index.write("<td>%s</td>" % os.path.basename(image_path))
             index.write("<td><img src='%s'></td>" % (sample_file if os.path.isabs(sample_file) else (
