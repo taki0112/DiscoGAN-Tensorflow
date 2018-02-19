@@ -86,6 +86,9 @@ class DiscoGAN(object):
         # Generator
         self.fake_B = self.generator(self.domain_A, is_training=True, scope='generator_B') # B'
         self.fake_A = self.generator(self.domain_B, is_training=True, scope='generator_A') # A'
+        
+        self.test_B = self.generator(self.domain_A, is_training=False, scope='generator_B')
+        self.test_A = self.generator(self.domain_B, is_training=False, scope='generator_A')
 
         self.recon_A = self.generator(self.fake_B, is_training=True, reuse=True, scope='generator_A') # A -> B' -> A
         self.recon_B = self.generator(self.fake_A, is_training=True, reuse=True, scope='generator_B') # B -> A -> B
@@ -262,7 +265,7 @@ class DiscoGAN(object):
             sample_image = np.asarray(load_test_data(sample_file))
             image_path = os.path.join(self.result_dir,'{0}'.format(os.path.basename(sample_file)))
 
-            fake_img = self.sess.run(self.fake_B, feed_dict = {self.domain_A :sample_image})
+            fake_img = self.sess.run(self.test_B, feed_dict = {self.domain_A :sample_image})
             save_images(fake_img, [1, 1], image_path)
             index.write("<td>%s</td>" % os.path.basename(image_path))
             index.write("<td><img src='%s' width='%d' height='%d'></td>" % (sample_file if os.path.isabs(sample_file) else (
@@ -276,7 +279,7 @@ class DiscoGAN(object):
             sample_image = np.asarray(load_test_data(sample_file))
             image_path = os.path.join(self.result_dir,'{0}'.format(os.path.basename(sample_file)))
 
-            fake_img = self.sess.run(self.fake_A, feed_dict = {self.domain_B : sample_image})
+            fake_img = self.sess.run(self.test_A, feed_dict = {self.domain_B : sample_image})
             save_images(fake_img, [1, 1], image_path)
             index.write("<td>%s</td>" % os.path.basename(image_path))
             index.write("<td><img src='%s' width='%d' height='%d'></td>" % (sample_file if os.path.isabs(sample_file) else (
