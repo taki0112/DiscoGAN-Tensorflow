@@ -1,20 +1,34 @@
-
 from DiscoGAN import DiscoGAN
 import argparse
-from ops import *
 from utils import *
+
 """parsing and configuration"""
 def parse_args():
     desc = "Tensorflow implementation of DiscoGAN"
     parser = argparse.ArgumentParser(description=desc)
-    parser.add_argument('--phase', type=str, default='train', help='train or test ?')
-    parser.add_argument('--epoch', type=int, default=200, help='The number of epochs to run')
-    parser.add_argument('--batch_size', type=int, default=1, help='The size of batch')
-    parser.add_argument('--lr', type=float, default=2e-4, help='learning_rate')
-    parser.add_argument('--beta1', type=float, default=0.5, help='Adam')
-    parser.add_argument('--beta2', type=float, default=0.999, help='Adam')
-    parser.add_argument('--weight_decay', type=float, default=0.0001, help='Weight_decay')
-    parser.add_argument('--dataset', type=str, default='cat2dog', help='dataset_name')
+    parser.add_argument('--phase', type=str, default='train', help='train or test')
+    parser.add_argument('--dataset', type=str, default='summer2winter', help='dataset_name')
+    parser.add_argument('--augment_flag', type=bool, default=False, help='Image augmentation use or not')
+
+    parser.add_argument('--epoch', type=int, default=2, help='The number of epochs to run')
+    parser.add_argument('--iteration', type=int, default=100000, help='The number of training iterations')
+    parser.add_argument('--batch_size', type=int, default=1, help='The batch size')
+    parser.add_argument('--print_freq', type=int, default=1000, help='The number of image_print_freq')
+    parser.add_argument('--save_freq', type=int, default=1000, help='The number of ckpt_save_freq')
+
+    parser.add_argument('--gan_type', type=str, default='gan', help='GAN loss type [gan / lsgan]')
+
+    parser.add_argument('--lr', type=float, default=0.0002, help='The learning rate')
+    parser.add_argument('--gan_w', type=float, default=1.0, help='weight of adversarial loss')
+    parser.add_argument('--cycle_w', type=float, default=1.0, help='weight of cycle loss')
+
+    parser.add_argument('--ch', type=int, default=64, help='base channel number per layer')
+
+    parser.add_argument('--n_dis', type=int, default=4, help='The number of discriminator layer')
+
+    parser.add_argument('--img_size', type=int, default=256, help='The size of image')
+    parser.add_argument('--img_ch', type=int, default=3, help='The size of image channel')
+
     parser.add_argument('--checkpoint_dir', type=str, default='checkpoint',
                         help='Directory name to save the checkpoints')
     parser.add_argument('--result_dir', type=str, default='results',
@@ -62,9 +76,7 @@ def main():
 
     # open session
     with tf.Session(config=tf.ConfigProto(allow_soft_placement=True)) as sess:
-        gan = DiscoGAN(sess, epoch=args.epoch, dataset=args.dataset, batch_size=args.batch_size, learning_rate=args.lr,
-                       beta1=args.beta1, beta2 =args.beta2, weight_decay=args.weight_decay,
-                       checkpoint_dir=args.checkpoint_dir, result_dir=args.result_dir, log_dir=args.log_dir, sample_dir=args.sample_dir)
+        gan = DiscoGAN(sess, args)
 
         # build graph
         gan.build_model()
