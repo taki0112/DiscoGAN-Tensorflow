@@ -88,7 +88,7 @@ class DiscoGAN(object) :
 
                 channel = channel // 2
 
-            x = conv(x, channels=3, kernel=4, stride=2, pad=1, use_bias=False, scope='G_logit')
+            x = deconv(x, channels=3, kernel=4, stride=2, use_bias=False, scope='G_logit')
             x = tanh(x)
 
             return x
