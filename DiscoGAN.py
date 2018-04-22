@@ -120,7 +120,7 @@ class DiscoGAN(object) :
     ##################################################################################
 
     def generate_a2b(self, x_A, is_training=True, reuse=False):
-        x_ab = self.generator(x_A, is_training, reuse=reuse, scope='generator_A')
+        x_ab = self.generator(x_A, is_training, reuse=reuse, scope='generator_B')
 
         return x_ab
 
