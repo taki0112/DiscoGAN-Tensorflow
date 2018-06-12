@@ -182,10 +182,10 @@ class DiscoGAN(object) :
         recon_loss_b = L1_loss(x_bab, self.domain_B) # reconstruction
 
         Generator_A_loss = self.gan_w * G_ad_loss_a + \
-                           self.cycle_w * recon_loss_a
+                           self.cycle_w * recon_loss_b
 
         Generator_B_loss = self.gan_w * G_ad_loss_b + \
-                           self.cycle_w * recon_loss_b
+                           self.cycle_w * recon_loss_a
 
         Discriminator_A_loss = self.gan_w * D_ad_loss_a
         Discriminator_B_loss = self.gan_w * D_ad_loss_b
