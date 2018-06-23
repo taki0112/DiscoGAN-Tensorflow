@@ -8,8 +8,8 @@ Tensorflow implementation of DiscoGAN
 * [presentation](https://www.slideshare.net/ssuser34f9fc/gan-inkakao)
 * [CycleGAN](https://github.com/taki0112/CycleGAN-Tensorflow)
 * [UNIT](https://github.com/taki0112/UNIT-Tensorflow)
-* [TripleGAN](https://github.com/taki0112/TripleGAN-Tensorflow)
 * [MUNIT](https://github.com/taki0112/MUNIT-Tensorflow)
+* [StarGAN-Tensorflow](https://github.com/taki0112/StarGAN-Tensorflow)
 
 ## Author
 Junho Kim
